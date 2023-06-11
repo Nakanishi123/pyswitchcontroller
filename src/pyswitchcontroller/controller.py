@@ -1,6 +1,6 @@
 from pyftdi import serialext
 from time import sleep
-from enum import IntEnum, Enum
+from enum import IntEnum
 from typing import Optional
 import sys
 from PyQt6.QtWidgets import (
