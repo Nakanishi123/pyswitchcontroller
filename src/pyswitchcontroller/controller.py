@@ -1,6 +1,19 @@
 from pyftdi import serialext
 from time import sleep
-from enum import IntEnum, Enum, auto
+from enum import IntEnum, Enum
+from typing import Optional
+import sys
+from PyQt6.QtWidgets import (
+    QWidget,
+    QApplication,
+    QLabel,
+    QLineEdit,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+)
+from PyQt6.QtCore import QPointF, QRectF, QLineF, QPoint, QRect, QLine, pyqtSignal
+from PyQt6.QtGui import QPainter, QBrush, QColor, QMouseEvent
 
 
 class Button(IntEnum):
@@ -41,10 +54,8 @@ class Controller:
         Args:
             button (Button): button to press
         """
-        self.port.write(b"S")
-        self.port.write([button.value])
-        self.port.write([1])
-        self.port.write(b"E")
+        command = b"S" + button.value.to_bytes(1, "big") + b"\x01\x45"
+        self.port.write(command)
 
     def release(self, button: Button) -> None:
         """release button
@@ -52,10 +63,8 @@ class Controller:
         Args:
             button (Button): button to release
         """
-        self.port.write(b"S")
-        self.port.write([button.value])
-        self.port.write([14])
-        self.port.write(b"E")
+        command = b"S" + button.value.to_bytes(1, "big") + b"\xf2\x45"
+        self.port.write(command)
 
     def tilt_left_stick(self, x: int, y: int) -> None:
         """tilt left stick
@@ -67,15 +76,17 @@ class Controller:
         if x < 0 or x > 255 or y < 0 or y > 255:
             raise ValueError("x and y must be between 0 and 255")
 
-        self.port.write(b"S")
-        self.port.write([JoyStick.leftX.value])
-        self.port.write([x])
-        self.port.write(b"E")
-
-        self.port.write(b"S")
-        self.port.write([JoyStick.leftY.value])
-        self.port.write([y])
-        self.port.write(b"E")
+        command = (
+            b"S"
+            + JoyStick.leftX.value.to_bytes(1, "big")
+            + x.to_bytes(1, "big")
+            + b"E"
+            + b"S"
+            + JoyStick.leftY.value.to_bytes(1, "big")
+            + y.to_bytes(1, "big")
+            + b"E"
+        )
+        self.port.write(command)
 
     def tilt_right_stick(self, x: int, y: int) -> None:
         """tilt right stick
@@ -87,15 +98,17 @@ class Controller:
         if x < 0 or x > 255 or y < 0 or y > 255:
             raise ValueError("x and y must be between 0 and 255")
 
-        self.port.write(b"S")
-        self.port.write([JoyStick.rightX.value])
-        self.port.write([x])
-        self.port.write(b"E")
-
-        self.port.write(b"S")
-        self.port.write([JoyStick.rightY.value])
-        self.port.write([y])
-        self.port.write(b"E")
+        command = (
+            b"S"
+            + JoyStick.rightX.value.to_bytes(1, "big")
+            + x.to_bytes(1, "big")
+            + b"E"
+            + b"S"
+            + JoyStick.rightY.value.to_bytes(1, "big")
+            + y.to_bytes(1, "big")
+            + b"E"
+        )
+        self.port.write(command)
 
     def push_button(self, button: Button, input_time: float = 0.1) -> None:
         """push button
