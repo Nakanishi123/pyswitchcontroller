@@ -225,7 +225,6 @@ class ControllerGui(QWidget):
         self.url_label = QLabel("URL:")
         self.url_entry = QLineEdit(self.url)
         self.execute_button = QPushButton("connect")
-        self.execute_button.clicked.connect(self.connect)
 
         self.urlbox = QHBoxLayout()
         self.urlbox.addWidget(self.url_label)
@@ -237,6 +236,7 @@ class ControllerGui(QWidget):
         self.minus_button = QPushButton("-")
         self.zl_button = QPushButton("ZL")
         self.l_button = QPushButton("L")
+        self.l_click = QPushButton("L_click")
         self.left_joycon = JoystickWidget()
         self.up_button = QPushButton("↑")
         self.left_button = QPushButton("←")
@@ -247,6 +247,7 @@ class ControllerGui(QWidget):
         self.left.addWidget(self.minus_button)
         self.left.addWidget(self.zl_button)
         self.left.addWidget(self.l_button)
+        self.left.addWidget(self.l_click)
         self.left.addWidget(self.left_joycon)
         self.arrows = QVBoxLayout()
         self.arrows.addWidget(self.up_button)
@@ -267,6 +268,7 @@ class ControllerGui(QWidget):
         self.y_button = QPushButton("Y")
         self.a_button = QPushButton("A")
         self.b_button = QPushButton("B")
+        self.r_click = QPushButton("R_click")
         self.right_joycon = JoystickWidget()
         self.home_button = QPushButton("HOME")
 
@@ -281,6 +283,7 @@ class ControllerGui(QWidget):
         self.buttons.addLayout(self.buttons_h)
         self.buttons.addWidget(self.b_button)
         self.right.addLayout(self.buttons)
+        self.right.addWidget(self.r_click)
         self.right.addWidget(self.right_joycon)
         self.right.addWidget(self.home_button)
 
@@ -295,12 +298,16 @@ class ControllerGui(QWidget):
         self.setLayout(self.all_layout)
 
     def __init_bind(self):
+        self.execute_button.clicked.connect(self.connect)
+
         self.minus_button.pressed.connect(lambda: self.button_press(Button.MINUS))
         self.minus_button.released.connect(lambda: self.button_release(Button.MINUS))
         self.zl_button.pressed.connect(lambda: self.button_press(Button.ZL))
         self.zl_button.released.connect(lambda: self.button_release(Button.ZL))
         self.l_button.pressed.connect(lambda: self.button_press(Button.L))
         self.l_button.released.connect(lambda: self.button_release(Button.L))
+        self.l_click.pressed.connect(lambda: self.button_press(Button.LCLICK))
+        self.l_click.released.connect(lambda: self.button_release(Button.LCLICK))
         self.left_joycon.pressed.connect(lambda x, y: self.tilt_left(x, y))
         self.left_joycon.released.connect(lambda x, y: self.tilt_left(128, 128))
         self.up_button.pressed.connect(lambda: self.button_press(Button.UP))
@@ -328,6 +335,8 @@ class ControllerGui(QWidget):
         self.a_button.released.connect(lambda: self.button_release(Button.A))
         self.b_button.pressed.connect(lambda: self.button_press(Button.B))
         self.b_button.released.connect(lambda: self.button_release(Button.B))
+        self.r_click.pressed.connect(lambda: self.button_press(Button.RCLICK))
+        self.r_click.released.connect(lambda: self.button_release(Button.RCLICK))
         self.right_joycon.pressed.connect(lambda x, y: self.tilt_right(x, y))
         self.right_joycon.released.connect(lambda x, y: self.tilt_right(128, 128))
         self.home_button.pressed.connect(lambda: self.button_press(Button.HOME))
