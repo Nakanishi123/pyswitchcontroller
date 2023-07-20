@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyswitchcontroller"
-version = "0.0.4"
+version = "0.0.5"
 description = "switch controller with python"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -19,6 +19,5 @@ classifiers = [
 ]
 dependencies = [
     "pyftdi",
-    "opencv-python",
     "pyqt6",
 ]
