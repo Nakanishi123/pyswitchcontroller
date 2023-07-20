@@ -110,17 +110,27 @@ class Controller:
         )
         self.port.write(command)
 
-    def push_button(self, button: Button, input_time: float = 0.1) -> None:
+    def push_button(
+        self,
+        button: Button,
+        input_time: float = 0.1,
+        pre_delay_time: float = 0,
+        delay_time: float = 0,
+    ) -> None:
         """push button
 
         Args:
             button (Button): button to push
             input_time (float, optional): time between button press and release. Defaults to 0.1.
+            pre_delay_time (float, optional): time to wait before pushing the button. Defaults to 0.
+            delay_time (float, optional): time to delay after button release. Defaults to 0.
         """
+
+        sleep(pre_delay_time)
         self.press(button)
         sleep(input_time)
         self.release(button)
-
+        sleep(delay_time)
 
     def initialize(self) -> None:
         """initialize controller"""
