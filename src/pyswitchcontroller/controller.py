@@ -122,6 +122,15 @@ class Controller:
         self.release(button)
 
 
+    def initialize(self) -> None:
+        """initialize controller"""
+        for e in Button:
+            self.release(e)
+
+        self.tilt_left_stick(128, 128)
+        self.tilt_right_stick(128, 128)
+
+
 class JoystickWidget(QWidget):
     pressed = pyqtSignal(int, int)
     released = pyqtSignal(int, int)
