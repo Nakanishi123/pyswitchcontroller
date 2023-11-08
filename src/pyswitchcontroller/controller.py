@@ -1,7 +1,6 @@
-from pyftdi import serialext
-from time import sleep
+from pyftdi import serialext  # type: ignore
 from enum import IntEnum
-from typing import Optional
+from typing import Optional, Tuple
 import sys
 from PyQt6.QtWidgets import (
     QWidget,
@@ -13,7 +12,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
 )
 from PyQt6.QtCore import QPoint, QRect, pyqtSignal
-from PyQt6.QtGui import QPainter, QBrush, QColor, QMouseEvent
+from PyQt6.QtGui import QPainter, QBrush, QColor, QMouseEvent, QPaintEvent
 
 
 class Button(IntEnum):
@@ -45,7 +44,7 @@ class JoyStick(IntEnum):
 
 
 class Controller:
-    def __init__(self, url: str, baudrate=115200) -> None:
+    def __init__(self, url: str, baudrate: int = 115200) -> None:
         self.port = serialext.serial_for_url(url, baudrate=baudrate)
 
     def press(self, button: Button) -> None:
@@ -145,13 +144,13 @@ class JoystickWidget(QWidget):
     pressed = pyqtSignal(int, int)
     released = pyqtSignal(int, int)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QWidget] = None):
         super().__init__(parent)
         self.setMinimumSize(150, 150)
         self.movingOffset = QPoint(0, 0)
         self.grabCenter = False
 
-    def paintEvent(self, event):
+    def paintEvent(self, a0: Optional[QPaintEvent]):
         painter = QPainter(self)
         self.bounds = QRect(
             -self.__maxDistance, -self.__maxDistance, self.__maxDistance * 2, self.__maxDistance * 2
@@ -194,17 +193,18 @@ class JoystickWidget(QWidget):
                 limit_point.setY(self.bounds.bottomRight().y())
         return limit_point
 
-    def mousePressEvent(self, ev: QMouseEvent):
-        self.grabCenter = self._centerEllipse().contains(ev.pos())
-        super().mousePressEvent(ev)
+    def mousePressEvent(self, a0: Optional[QMouseEvent]):
+        if a0 is not None:
+            self.grabCenter = self._centerEllipse().contains(a0.pos())
+        super().mousePressEvent(a0)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, a0: Optional[QMouseEvent]):
         self.grabCenter = False
         self.movingOffset = QPoint(0, 0)
         self.update()
         self.released.emit(*self.normVec())
 
-    def normVec(self) -> tuple[int, int]:
+    def normVec(self) -> Tuple[int, int]:
         """0~255に正規化されたjoyStickの座標
 
         Returns:
@@ -218,9 +218,9 @@ class JoystickWidget(QWidget):
         y = int(place.y() / (self.__maxDistance * 2) * 255)
         return x, y
 
-    def mouseMoveEvent(self, event: QMouseEvent):
-        if self.grabCenter:
-            self.movingOffset = self._boundJoystick(event.pos())
+    def mouseMoveEvent(self, a0: Optional[QMouseEvent]):
+        if self.grabCenter and a0 is not None:
+            self.movingOffset = self._boundJoystick(a0.pos())
             self.update()
         self.pressed.emit(*self.normVec())
 
@@ -230,16 +230,14 @@ class JoystickWidget(QWidget):
 
 
 class ControllerGui(QWidget):
-    con: Controller = None
-
     def __init__(self, url: Optional[str] = None, baudrate: int = 115200):
         super().__init__()
         self.url = url if url is not None else ""
         self.baudrate = baudrate
-        self.__init_ui()
-        self.__init_bind()
+        self._init_ui()
+        self._init_bind()
 
-    def __init_ui(self):
+    def _init_ui(self):
         # URLの入力欄の作成
         self.url_label = QLabel("URL:")
         self.url_entry = QLineEdit(self.url)
@@ -316,7 +314,7 @@ class ControllerGui(QWidget):
         self.all_layout.addLayout(self.controller)
         self.setLayout(self.all_layout)
 
-    def __init_bind(self):
+    def _init_bind(self):
         self.execute_button.clicked.connect(self.connect)
 
         self.minus_button.pressed.connect(lambda: self.button_press(Button.MINUS))
@@ -367,6 +365,7 @@ class ControllerGui(QWidget):
             self.con = Controller(self.url, self.baudrate)
             print("connect")
         except:
+            self.con = None
             print("not connect")
 
     def button_press(self, button: Button):
@@ -395,6 +394,20 @@ class ControllerGui(QWidget):
 
 
 def show_devices():
-    from pyftdi.ftdi import Ftdi
+    from pyftdi.ftdi import Ftdi  # type: ignore
 
     Ftdi.show_devices()
+
+
+if __name__ == "__main__":
+    from time import sleep
+
+    for e in Button:
+        print(e)
+    show_devices()
+    app = QApplication(sys.argv)
+    window = ControllerGui("ftdi://ftdi:232:A50285BI/1")
+    window.show()
+    app.exec()
+    # window.con.push_button(Button.A)
+    # window.con.initialize()
