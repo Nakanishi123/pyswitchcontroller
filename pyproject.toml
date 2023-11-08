@@ -1,23 +1,49 @@
-[build-system]
-requires = ["wheel", "setuptools"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "pyswitchcontroller"
-version = "0.0.5"
-description = "switch controller with python"
+version = "0.0.1"
+description = "A Python library for controlling the Nintendo Switch via USB."
+license = "GPL-3.0"
+authors = [
+    { name = "Nakanishi", email = "45790603+Nakanishi123@users.noreply.github.com" },
+]
+dependencies = ["pyftdi>=0.55.0", "pyqt6>=6.6.0"]
 readme = "README.md"
-requires-python = ">=3.8"
-license = {file = "LICENSE.txt"}
+requires-python = ">= 3.8"
 classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",  
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3 :: Only",
 ]
-dependencies = [
-    "pyftdi",
-    "pyqt6",
+
+[project.urls]
+"Homepage" = "https://github.com/Nakanishi123/pyswitchcontroller"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.black]
+line-length = 120
+
+[tool.pyright]
+pythonVersion = "3.8"
+typeCheckingMode = "strict"
+reportUnknownMemberType = "none"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "black>=23.7.0",
+    "pytest>=7.4.0",
+    "pyright>=1.1.324",
+    "hatchling>=1.18.0",
+    "build>=0.10.0",
+    "twine>=4.0.2",
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
